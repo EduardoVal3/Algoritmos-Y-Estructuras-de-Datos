@@ -30,7 +30,7 @@ if __name__ == "__main__":
     for elemento in secuencia:
         cola_especial.insertar(elemento)
         
-    print("Resultado de la cola:", cola_especial.mostrar_cola())   
+    print("Resultado:", cola_especial.mostrar_cola())   
                 
                 
                 
