@@ -1,0 +1,153 @@
+EJERCICIO 1:
+
+2.1 A la clase Array del programa Array.py (listado 2-3), añada un método llamado getMaxNum() que devuelva el valor del número más alto del array, o None si el array no tiene números. Puede utilizar la expresión isinstance(x, (int, float)) para comprobar los números. Añada algo de código a ArrayClient.py (listado 2-4) para ejercitar este método. Debe probarlo en matrices que contengan una variedad de tipos de datos y algunos que contengan ceros y otros que no contengan números.
+
+listado 2-3:
+Array.py
+
+class Array(object):
+ def __init__(self, initialSize): # Constructor
+ self.__a = [None] * initialSize # The array stored as a list
+ self.__nItems = 0 # No items in array initially
+ def __len__(self): # Special def for len() func
+ return self.__nItems # Return number of items
+ def get(self, n): # Return the value at index n
+ if 0 <= n and n < self.__nItems: # Check if n is in bounds, and
+ return self.__a[n] # only return item if in bounds
+ def set(self, n, value): # Set the value at index n
+ if 0 <= n and n < self.__nItems: # Check if n is in bounds, and
+ self.__a[n] = value # only set item if in bounds
+ def insert(self, item): # Insert item at end
+ self.__a[self.__nItems] = item # Item goes at current end
+ self.__nItems += 1 # Increment number of items
+ def find(self, item): # Find index for item
+ for j in range(self.__nItems): # Among current items
+ if self.__a[j] == item: # If found,
+ return j # then return index to item
+ return -1 # Not found -> return -1
+ def search(self, item): # Search for item
+ return self.get(self.find(item)) # and return item if found
+ def delete(self, item): # Delete first occurrence
+ for j in range(self.__nItems): # of an item
+ if self.__a[j] == item: # Found item
+ self.__nItems -= 1 # One fewer at end
+ for k in range(j, self.__nItems): # Move items from
+ self.__a[k] = self.__a[k+1] # right over 1
+ return True # Return success flag
+ return False # Made it here, so couldn't find the item
+ def traverse(self, function=print): # Traverse all items
+ for j in range(self.__nItems): # and apply a function
+ function(self.__a[j])
+
+listado 2-4:
+ArrayClient.py
+
+import Array
+maxSize = 10 # Max size of the array
+arr = Array.Array(maxSize) # Create an array object
+arr.insert(77) # Insert 10 items
+arr.insert(99)
+arr.insert("foo")
+arr.insert("bar")
+arr.insert(44)
+arr.insert(55)
+arr.insert(12.34)
+arr.insert(0)
+arr.insert("baz")
+arr.insert(-17)
+print("Array containing", len(arr), "items")
+arr.traverse()
+
+
+SOLUCION:
+
+Array.py:
+
+class Array(object):
+    def __init__(self, initialSize):  # Constructor
+        self.__a = [None] * initialSize  # El arreglo almacenado como una lista
+        self.__nItems = 0  # Inicialmente, no hay elementos en el arreglo
+
+    def __len__(self):  # Definición especial para la función len()
+        return self.__nItems  # Retorna el número de elementos
+
+    def get(self, n):  # Retorna el valor en el índice n
+        if 0 <= n < self.__nItems:  # Verifica si n está dentro de los límites
+            return self.__a[n]  # Solo retorna el elemento si está dentro de los límites
+
+    def set(self, n, value):  # Establece el valor en el índice n
+        if 0 <= n < self.__nItems:  # Verifica si n está dentro de los límites
+            self.__a[n] = value  # Solo establece el elemento si está dentro de los límites
+
+    def insert(self, item):  # Inserta el elemento al final
+        self.__a[self.__nItems] = item  # El elemento va al final actual
+        self.__nItems += 1  # Incrementa el número de elementos
+
+    def find(self, item):  # Encuentra el índice de un elemento
+        for j in range(self.__nItems):  # Entre los elementos actuales
+            if self.__a[j] == item:  # Si se encuentra,
+                return j  # retorna el índice del elemento
+        return -1  # No encontrado -> retorna -1
+
+    def search(self, item):  # Busca un elemento
+        return self.get(self.find(item))  # y retorna el elemento si se encuentra
+
+    def delete(self, item):  # Elimina la primera aparición de un elemento
+        for j in range(self.__nItems):  # Busca entre los elementos actuales
+            if self.__a[j] == item:  # Si encuentra el elemento
+                self.__nItems -= 1  # Un elemento menos al final
+                for k in range(j, self.__nItems):  # Mueve los elementos
+                    self.__a[k] = self.__a[k + 1]  # uno a la izquierda
+                return True  # Retorna señal de éxito
+        return False  # No se encontró el elemento
+
+    def traverse(self, function=print):  # Recorre todos los elementos
+        for j in range(self.__nItems):  # y aplica una función
+            function(self.__a[j])
+
+    def getMaxNum(self):
+        max_num = None  # Inicializa el número máximo como None
+        for item in self.__a[:self.__nItems]:  # Itera solo sobre los elementos en uso
+            if isinstance(item, (int, float)):  # Verifica si el elemento es un número
+                if max_num is None or item > max_num:
+                    max_num = item
+        return max_num
+
+
+
+
+ArrayClient.py:
+
+import Array
+
+maxSize = 10  # Tamaño máximo del arreglo
+arr = Array.Array(maxSize)  # Crea un objeto de tipo Array
+
+# Inserta varios elementos de distintos tipos
+arr.insert(77)
+arr.insert(99)
+arr.insert("foo")
+arr.insert("bar")
+arr.insert(44)
+arr.insert(55)
+arr.insert(12.34)
+arr.insert(0)
+arr.insert("baz")
+arr.insert(-17)
+
+print("Array con", len(arr), "elementos:")
+arr.traverse()
+
+# Prueba el método getMaxNum()
+max_num = arr.getMaxNum()
+print("El valor numérico máximo en el arreglo es:", max_num)
+
+# Prueba con un arreglo que no contiene números
+arr2 = Array.Array(maxSize)
+arr2.insert("apple")
+arr2.insert("banana")
+arr2.insert("cherry")
+print("\nArray que solo contiene cadenas:")
+arr2.traverse()
+print("El valor numérico máximo en este arreglo es:", arr2.getMaxNum())
+

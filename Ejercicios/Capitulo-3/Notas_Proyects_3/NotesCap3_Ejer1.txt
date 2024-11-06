@@ -1,0 +1,36 @@
+EJERCICIO 1:
+
+3.1 En el método bubbleSort() (listado 3-1) y en la herramienta de visualización, el índice interno siempre va de izquierda a derecha, encontrando el elemento más grande y llevándolo a cabo a la derecha. Modifica el método bubbleSort() para que sea bidireccional. Esto significa que el índice interno llevará primero el elemento más grande de izquierda a derecha como antes, pero cuando llegue al último, se invertirá y llevará el elemento más pequeño de derecha a izquierda. Necesita dos índices exteriores, uno a la derecha (el último antiguo) y otro a la izquierda. 
+
+listado 3-1
+
+ def bubbleSort(self): # Sort comparing adjacent vals
+ for last in range(self.__nItems-1, 0, -1): # and bubble up
+ for inner in range(last): # inner loop goes up to last
+ if self.__a[inner] > self.__a[inner+1]: # If item less
+ self.swap(inner, inner+1) # than adjacent item, swap
+
+
+
+SOLUCION:
+
+def bubbleSortBidirectional(self):
+    left = 0  # índice exterior izquierdo
+    right = self.__nItems - 1  # índice exterior derecho
+
+    while left < right:
+        # Paso de izquierda a derecha: encontrar el elemento más grande y llevarlo al final
+        for i in range(left, right):
+            if self.__a[i] > self.__a[i + 1]:
+                self.swap(i, i + 1)
+        
+        # Reducir el límite derecho, ya que el elemento mayor está en su lugar
+        right -= 1
+
+        # Paso de derecha a izquierda: encontrar el elemento más pequeño y llevarlo al inicio
+        for i in range(right, left, -1):
+            if self.__a[i] < self.__a[i - 1]:
+                self.swap(i, i - 1)
+        
+        # Aumentar el límite izquierdo, ya que el elemento menor está en su lugar
+        left += 1

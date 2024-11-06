@@ -1,0 +1,7 @@
+EJERCICIO 6:
+
+3.6 Esta es una forma interesante de eliminar elementos con claves duplicadas de una matriz. La ordenación por inserción utiliza un algoritmo de bucle dentro de un bucle que compara todos los elementos de la matriz con los elementos parcialmente ordenados hasta el momento. Una forma de eliminar elementos con claves duplicadas sería modificar el algoritmo de la clase Array en el módulo SortArray.py (Listado 3-4) para que elimine los duplicados a medida que ordena. Este es un enfoque: cuando se encuentra una clave duplicada, en lugar de copiar el duplicado en la celda de la matriz en su posición ordenada, cambie la clave del elemento marcado para que sea un valor especial que se trate como inferior a cualquier otra clave posible. Con ese valor de clave bajo, se mueve automáticamente a su lugar al principio de la matriz. Al realizar un seguimiento de cuántos duplicados se encuentran, conoce el final de los duplicados y el comienzo de los elementos restantes en la matriz. Cuando termina el bucle externo, el algoritmo tendría que hacer una pasada más para cambiar las claves únicas a las celdas ocupadas por los duplicados. Escriba un método insertionSortAndDedupe() que realice esta operación. Asegúrese de probar que funciona con todos los diferentes tipos de datos de matriz de entrada.
+
+
+
+SOLUCION:

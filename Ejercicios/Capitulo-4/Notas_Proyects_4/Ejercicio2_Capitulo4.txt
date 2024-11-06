@@ -1,0 +1,44 @@
+EJERCICIO 2:
+
+4.2 Cree un programa que determine si una cadena de entrada es un palíndromo o no, ignorando los espacios en blanco, los dígitos, la puntuación y el caso de las letras. Los palíndromos son palabras o frases que tienen la misma secuencia de letras hacia adelante y hacia atrás. Muestre la salida de su programa en "Un hombre, un plan, un canal, Panamá". Debe utilizar una pila como parte de la implementación, como se muestra en el programa ReverseWord.py en el listado 4-3.
+
+listado 4-3:
+ReverseWord.py:
+ # A program to reverse the letters of a word
+from SimpleStack import *
+stack = Stack(100) # Create a stack to hold letters
+word = input("Word to reverse: ")
+for letter in word: # Loop over letters in word
+ if not stack.isFull(): # Push letters on stack if not full
+ stack.push(letter)
+reverse = '' # Build the reversed version
+while not stack.isEmpty(): # by popping the stack until empty
+ reverse += stack.pop()
+print('The reverse of', word, 'is', reverse)
+
+
+SOLUCION:
+
+# Programa para determinar si una cadena es un palíndromo usando una pila
+from SimpleStack import *
+
+def is_palindrome(s):
+    stack = Stack(len(s))  # Crear una pila del tamaño de la cadena
+    sanitized_string = ''.join(char.lower() for char in s if char.isalpha())  # Normalizar la cadena
+
+    for char in sanitized_string:
+        stack.push(char)
+
+    reversed_string = ''
+    while not stack.isEmpty():
+        reversed_string += stack.pop()
+
+    return sanitized_string == reversed_string
+
+# Ejemplo de uso
+phrase = "Un hombre, un plan, un canal, Panamá"
+if is_palindrome(phrase):
+    print(f'"{phrase}" es un palíndromo.')
+else:
+    print(f'"{phrase}" no es un palíndromo.')
+

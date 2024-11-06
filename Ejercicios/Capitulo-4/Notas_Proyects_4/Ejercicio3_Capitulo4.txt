@@ -1,0 +1,125 @@
+EJERCICIO 3:
+
+4.3 Cree una clase Deque basada en la discusión de deques (colas dobles) en este capítulo. Debe incluir los métodos insertLeft(), insertRight(), removeLeft(), removeRight(), peekLeft(), peekRight(), isEmpty() e isFull(). Debe admitir la envoltura al final de la matriz, como lo hacen las colas.
+
+Deques:
+Hay varias variaciones de una cola básica que pueden resultarle útiles. Un deque es una cola de doble extremo. Puede insertar elementos en cualquiera de los extremos y eliminarlos de cualquiera de los extremos. Los métodos pueden llamarse insertLeft() e insertRight(), y removeLeft() y removeRight(). También puede encontrar esta estructura llamada dequeue, pero eso puede ser un problema porque a algunas implementaciones les gusta llamar a insert() como enqueue() y remove() como dequeue(). Se prefiere el deque más corto y se pronuncia "deck" para ayudar a distinguirlo de "dee cue". Si te limitas a insertLeft() y removeLeft() (o sus equivalentes a la derecha), el deque actúa como una pila. Si te limitas a insertLeft() y removeRight() (o el par opuesto), actúa como una cola. Un deque proporciona una estructura de datos más versátil que una pila o una cola y, a veces, se usa en bibliotecas de clases de contenedores para servir para ambos propósitos. Sin embargo, no se usa con tanta frecuencia como las pilas y las colas, por lo que no lo exploramos más aquí.
+
+
+
+SOLUCION:
+
+
+Deque.py:
+
+class Deque(object):
+    def __init__(self, max_size):
+        # Inicializa la deque con un tamaño máximo.
+        self.__deque = [None] * max_size
+        self.__max_size = max_size
+        self.__left = 0  # Índice del extremo izquierdo de la deque
+        self.__right = 0 # Índice del extremo derecho de la deque
+        self.__size = 0  # Número de elementos en la deque
+
+    def insertLeft(self, item):
+        # Inserta un elemento en el extremo izquierdo de la deque.
+        if self.isFull():
+            raise Exception("Deque está llena")
+        self.__left = (self.__left - 1) % self.__max_size  # Envolvimiento al final de la matriz
+        self.__deque[self.__left] = item
+        self.__size += 1
+
+    def insertRight(self, item):
+        # Inserta un elemento en el extremo derecho de la deque.
+        if self.isFull():
+            raise Exception("Deque está llena")
+        self.__deque[self.__right] = item
+        self.__right = (self.__right + 1) % self.__max_size  # Envolvimiento al final de la matriz
+        self.__size += 1
+
+    def removeLeft(self):
+        # Elimina y devuelve el elemento del extremo izquierdo de la deque.
+        if self.isEmpty():
+            raise Exception("Deque está vacía")
+        item = self.__deque[self.__left]
+        self.__deque[self.__left] = None  # Elimina la referencia al elemento
+        self.__left = (self.__left + 1) % self.__max_size  # Envolvimiento al final de la matriz
+        self.__size -= 1
+        return item
+
+    def removeRight(self):
+        # Elimina y devuelve el elemento del extremo derecho de la deque.
+        if self.isEmpty():
+            raise Exception("Deque está vacía")
+        self.__right = (self.__right - 1) % self.__max_size  # Envolvimiento al final de la matriz
+        item = self.__deque[self.__right]
+        self.__deque[self.__right] = None  # Elimina la referencia al elemento
+        self.__size -= 1
+        return item
+
+    def peekLeft(self):
+        # Devuelve el elemento del extremo izquierdo sin eliminarlo.
+        if self.isEmpty():
+            raise Exception("Deque está vacía")
+        return self.__deque[self.__left]
+
+    def peekRight(self):
+        # Devuelve el elemento del extremo derecho sin eliminarlo.
+        if self.isEmpty():
+            raise Exception("Deque está vacía")
+        return self.__deque[(self.__right - 1) % self.__max_size]
+
+    def isEmpty(self):
+        # Verifica si la deque está vacía.
+        return self.__size == 0
+
+    def isFull(self):
+        # Verifica si la deque está llena.
+        return self.__size == self.__max_size
+
+    def __len__(self):
+        # Devuelve el número de elementos en la deque.
+        return self.__size
+
+    def __str__(self):
+        # Devuelve una representación de cadena de la deque.
+        return str([self.__deque[(self.__left + i) % self.__max_size] for i in range(self.__size)])
+
+
+
+DequeClient.py:
+
+from Deque import Deque
+
+deque = Deque(5)  # Crear una deque con tamaño máximo de 5 elementos
+
+# Insertar elementos en ambos extremos
+deque.insertLeft(1)
+deque.insertRight(2)
+deque.insertLeft(3)
+deque.insertRight(4)
+deque.insertLeft(5)
+
+print("Contenido del deque después de las inserciones:", deque)
+
+# Intentar insertar en una deque llena
+try:
+    deque.insertRight(6)
+except Exception as e:
+    print(e)
+
+# Eliminar elementos de ambos extremos
+print("Elemento eliminado desde la izquierda:", deque.removeLeft())
+print("Elemento eliminado desde la derecha:", deque.removeRight())
+
+# Ver contenido actual del deque
+print("Contenido del deque después de las eliminaciones:", deque)
+
+# Mostrar los elementos en ambos extremos
+print("Elemento en el extremo izquierdo:", deque.peekLeft())
+print("Elemento en el extremo derecho:", deque.peekRight())
+
+# Comprobar si la deque está vacía o llena
+print("¿Está la deque vacía?", deque.isEmpty())
+print("¿Está la deque llena?", deque.isFull())
+

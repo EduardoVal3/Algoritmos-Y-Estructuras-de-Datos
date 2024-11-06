@@ -1,0 +1,7 @@
+EJERCICIO 4:
+
+3.4 Otra clasificación simple es la clasificación par-impar. La idea es hacer repetidamente dos pasadas a través de la matriz. En el primer paso, se observan todos los pares de elementos, a[j] y a[j + 1], donde j es impar (j = 1, 3, 5, ...). Si sus valores de clave están desordenados, los intercambia. En la segunda pasada, se hace lo mismo con todos los valores pares (j = 0, 2, 4, ...). Estas dos pasadas se realizan repetidamente hasta que se ordena la matriz. Añada un método oddEvenSort() a la clase Array en el módulo SortArray.py (listado 3-4). Realice el bucle exterior hasta que no se produzcan intercambios para ver cuántas pasadas se necesitan; Un paso incluye el intercambio de pares pares e impares. Asegúrese de que funcione para cantidades variables de datos y en pedidos iniciales buenos y malos. Después de probar cuántas pasadas se necesitan antes de que no se produzcan más intercambios, determine el número máximo de pasadas del bucle externo en función de la longitud de la matriz de entrada. La ordenación par-impar es realmente útil en un entorno de multiprocesamiento, donde un procesador separado puede operar en cada par impar simultáneamente y luego en cada par par. Debido a que los pares impares son independientes entre sí, cada par puede ser verificado (e intercambiado, si es necesario) por un procesador diferente. Esto hace que la clasificación sea muy rápida. 
+
+
+
+SOLUCION:

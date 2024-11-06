@@ -1,0 +1,136 @@
+EJERCICIO 1:
+
+4.1 Revise la clase Stack en SimpleStack.py se muestra en el listado 4-1 para lanzar excepciones si algo se empuja a una pila completa, o se extrae de una pila vacía. Escriba un programa de prueba que demuestre que la clase revisada acepta correctamente los elementos hasta el tamaño de la pila original y, a continuación, produce una excepción cuando se inserta otro elemento.
+
+listado 4-1:
+SimpleStack.py:
+# Implement a Stack data structure using a Python list
+class Stack(object):
+
+	def __init__(self, max): # Constructor
+		self.__stackList = [None] * max # The stack stored as a list
+ 		self.__top = -1 # No items initially
+
+ 	def push(self, item): # Insert item at top of stack
+ 		self.__top += 1 # Advance the pointer
+ 		self.__stackList[self.__top] = item # Store item
+
+ 	def pop(self): # Remove top item from stack
+ 		top = self.__stackList[self.__top] # Top item
+ 		self.__stackList[self.__top] = None # Remove item reference
+ 		self.__top -= 1 # Decrease the pointer
+ 		return top # Return top item
+
+ 	def peek(self): # Return top item
+ 		if not self.isEmpty(): # If stack is not empty
+ 			return self.__stackList[self.__top] # Return the top item
+
+ 	def isEmpty(self): # Check if stack is empty
+		return self.__top < 0
+
+	def isFull(self): # Check if stack is full
+ 		return self.__top >= len(self.__stackList) - 1
+
+ 	def __len__(self): # Return # of items on stack
+ 		return self.__top + 1
+
+ 	def __str__(self): # Convert stack to string
+ 		ans = "[" # Start with left bracket
+ 		for i in range(self.__top + 1): # Loop through current items
+ 			if len(ans) > 1: # Except next to left bracket,
+ 				ans += ", " # separate items with comma
+ 				ans += str(self.__stackList[i]) # Add string form of item
+ 				ans += "]" # Close with right bracket
+ 				return ans
+
+SimpleStackClient.py:
+from SimpleStack import *
+stack = Stack(10)
+for word in ['May', 'the', 'force', 'be', 'with', 'you']:
+ stack.push(word)
+print('After pushing', len(stack),
+ 'words on the stack, it contains:\n', stack)
+print('Is stack full?', stack.isFull())
+print('Popping items off the stack:')
+while not stack.isEmpty():
+ print(stack.pop(), end=' ')
+print()
+
+
+
+SOLUCION:
+
+SimpleStack.py:
+
+# Implementar una estructura de datos de Pila usando una lista de Python
+class Stack(object):
+    def __init__(self, max): # Constructor
+        self.__stackList = [None] * max # La pila almacenada como una lista
+        self.__top = -1 # No hay elementos inicialmente
+    
+    def push(self, item): # Insertar elemento en la parte superior de la pila
+        if self.isFull():
+            raise Exception("Desbordamiento de pila: intentando insertar en una pila llena")
+        self.__top += 1 # Avanzar el puntero
+        self.__stackList[self.__top] = item # Almacenar el elemento
+    
+    def pop(self): # Eliminar el elemento superior de la pila
+        if self.isEmpty():
+            raise Exception("Subdesbordamiento de pila: intentando extraer de una pila vacía")
+        top = self.__stackList[self.__top] # Elemento superior
+        self.__stackList[self.__top] = None # Eliminar referencia al elemento
+        self.__top -= 1 # Disminuir el puntero
+        return top # Devolver el elemento superior
+    
+    def peek(self): # Devolver el elemento superior
+        if not self.isEmpty(): # Si la pila no está vacía
+            return self.__stackList[self.__top] # Devolver el elemento superior
+    
+    def isEmpty(self): # Verificar si la pila está vacía
+        return self.__top < 0
+    
+    def isFull(self): # Verificar si la pila está llena
+        return self.__top >= len(self.__stackList) - 1
+    
+    def __len__(self): # Devolver el número de elementos en la pila
+        return self.__top + 1
+    
+    def __str__(self): # Convertir la pila a cadena de texto
+        ans = "[" # Comenzar con corchete izquierdo
+        for i in range(self.__top + 1): # Recorrer los elementos actuales
+            if len(ans) > 1: # Excepto junto al corchete izquierdo,
+                ans += ", " # separar elementos con coma
+            ans += str(self.__stackList[i]) # Añadir la forma de cadena del elemento
+        ans += "]" # Cerrar con corchete derecho
+        return ans
+
+
+SimpleStackClient.py:
+
+from SimpleStack import *
+
+stack = Stack(10)
+
+try:
+    # Insertar 10 elementos en la pila
+    for word in ['May', 'the', 'force', 'be', 'with', 'you', 'always', 'find', 'the', 'way']:
+        stack.push(word)
+    print('Después de insertar', len(stack), 'elementos en la pila, contiene:\n', stack)
+    print('¿Está la pila llena?', stack.isFull())
+
+    # Intentar insertar otro elemento en una pila llena
+    stack.push('extra')
+except Exception as e:
+    print(e)
+
+try:
+    print('Extrayendo elementos de la pila:')
+    while not stack.isEmpty():
+        print(stack.pop(), end=' ')
+    print()
+    
+    # Intentar extraer un elemento de una pila vacía
+    stack.pop()
+except Exception as e:
+    print(e)
+

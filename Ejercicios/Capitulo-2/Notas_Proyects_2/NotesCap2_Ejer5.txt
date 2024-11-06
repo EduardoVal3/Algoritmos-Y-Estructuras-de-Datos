@@ -1,0 +1,231 @@
+EJERCICIO 5:
+
+2.5 Agregue un método merge() a la clase OrderedRecordArray (Listado 2-8 y Listado 2-9) para que pueda fusionar un array de origen ordenado en el OrderedArray existente de ese objeto. La combinación solo debe producirse si las funciones clave de ambos objetos son idénticas. La solución debe crear una nueva lista lo suficientemente grande como para contener el contenido de la (auto) lista actual y la lista de matrices de combinación. Escribe pruebas para la implementación de tu clase que crea dos matrices, inserta algunos números aleatorios en ellas, invoca merge() para agregar el contenido de una a la otra y muestra el contenido de la matriz resultante. Las matrices de origen pueden contener diferentes números de elementos de datos. Su algoritmo necesita comparar las claves de las matrices de origen, eligiendo la más pequeña para copiarla en el destino. También debe controlar la situación en la que una matriz de origen agota su contenido antes que la otra. Tenga en cuenta que, en Python, puede acceder a los atributos privados de un parámetro de una manera similar al uso de self. Si el parámetro arr es un objeto OrderedRecordArray, puede tener acceso a su número de elementos como arr.__nItems.
+
+Listado 2-8 y Listado 2-9
+OrderedRecordArray.py:
+# Implement an Ordered Array of Records structure
+def identity(x): # The identity function
+ return x
+class OrderedRecordArray(object):
+ def __init__(self, initialSize, key=identity): # Constructor
+ self.__a = [None] * initialSize # The array stored as a list
+ self.__nItems = 0 # No items in array initially
+ self.__key = key # Key function gets record key
+ def __len__(self): # Special def for len() func
+ return self.__nItems # Return number of items
+ def get(self, n): # Return the value at index n
+ if n >= 0 and n < self.__nItems: # Check if n is in bounds, and
+ return self.__a[n] # only return item if in bounds
+ raise IndexError("Index " + str(n) + " is out of range")
+ def traverse(self, function=print): # Traverse all items
+ for j in range(self.__nItems): # and apply a function
+ function(self.__a[j])
+ def __str__(self): # Special def for str() func
+ ans = "[" # Surround with square brackets
+ for i in range(self.__nItems): # Loop through items
+ if len(ans) > 1: # Except next to left bracket,
+ ans += ", " # separate items with comma
+ ans += str(self.__a[i]) # Add string form of item
+ ans += "]" # Close with right bracket
+ return ans
+ def find(self, key): # Find index at or just below key
+ lo = 0 # in ordered list
+ hi = self.__nItems-1 # Look between lo and hi
+ while lo <= hi:
+ mid = (lo + hi) // 2 # Select the midpoint
+ if self.__key(self.__a[mid]) == key: # Did we find it?
+ return mid # Return location of item
+ elif self.__key(self.__a[mid]) < key: # Is key in upper half?
+ lo = mid + 1 # Yes, raise the lo boundary
+ else:
+ hi = mid - 1 # No, but could be in lower half
+ return lo # Item not found, return insertion point instead
+ def search(self, key):
+ idx = self.find(key) # Search for a record by its key
+ if idx < self.__nItems and self.__key(self.__a[idx]) == key:
+ return self.__a[idx] # and return item if found
+ def insert(self, item): # Insert item into the correct position
+ if self.__nItems >= len(self.__a): # If array is full,
+ raise Exception("Array overflow") # raise exception
+ j = self.find(self.__key(item)) # Find where item should go
+ for k in range(self.__nItems, j, -1): # Move bigger ítems right
+ self.__a[k] = self.__a[k-1]
+ self.__a[j] = item # Insert the item
+ self.__nItems += 1 # Increment the number of items
+ def delete(self, item): # Delete any occurrence
+ j = self.find(self.__key(item)) # Try to find the item
+ if j < self.__nItems and self.__a[j] == item: # If found,
+ self.__nItems -= 1 # One fewer at end
+ for k in range(j, self.__nItems): # Move bigger ítems left
+ self.__a[k] = self.__a[k+1]
+ return True # Return success flag
+ return False # Made it here; item not found
+
+
+
+
+OrderedRecordArrayClient.py:
+
+from OrderedRecordArray import *
+def second(x): # Key on second element of record
+ return x[1]
+maxSize = 1000 # Max size of the array
+arr = OrderedRecordArray(maxSize, second) # Create the array
+object
+# Insert 10 items
+for rec in [('a', 3.1), ('b', 7.5), ('c', 6.0), ('d', 3.1),
+ ('e', 1.4), ('f', -1.2), ('g', 0.0), ('h', 7.5),
+ ('i', 7.5), ('j', 6.0)]:
+ arr.insert(rec)
+print("Array containing", len(arr), "items:\n", arr)
+# Delete a few items, including some duplicates
+for rec in [('c', 6.0), ('g', 0.0), ('g', 0.0),
+ ('b', 7.5), ('i', 7.5)]:
+ print("Deleting", rec, "returns", arr.delete(rec))
+print("Array after deletions has", len(arr), "items:\n", arr)
+for key in [4.4, 6.0, 7.5]:
+ print("find(", key, ") returns", arr.find(key),
+ "and get(", arr.find(key), ") returns",
+ arr.get(arr.find(key)))
+
+
+
+
+SOLUCION:
+
+OrderedRecordArray.py:
+def identity(x):  # Función identidad
+    return x
+
+class OrderedRecordArray(object):
+    def __init__(self, initialSize, key=identity):  # Constructor
+        self.__a = [None] * initialSize  # El array se almacena como una lista
+        self.__nItems = 0  # Inicialmente no hay elementos en el array
+        self.__key = key  # La función clave obtiene la clave del registro
+
+    def __len__(self):  # Método especial para la función len()
+        return self.__nItems  # Devuelve el número de elementos
+
+    def get(self, n):  # Devuelve el valor en el índice n
+        if n >= 0 and n < self.__nItems:  # Verifica si n está dentro de los límites
+            return self.__a[n]  # Solo devuelve el elemento si está en los límites
+        raise IndexError("Índice " + str(n) + " fuera de rango")
+
+    def traverse(self, function=print):  # Recorre todos los elementos
+        for j in range(self.__nItems):  # y aplica una función a cada uno
+            function(self.__a[j])
+
+    def __str__(self):  # Método especial para la función str()
+        ans = "["  # Rodea la cadena con corchetes
+        for i in range(self.__nItems):  # Recorre todos los elementos
+            if len(ans) > 1:  # Excepto junto al corchete izquierdo,
+                ans += ", "  # separa los elementos con comas
+            ans += str(self.__a[i])  # Agrega la representación en cadena del elemento
+        ans += "]"  # Cierra con el corchete derecho
+        return ans
+
+    def find(self, key):  # Encuentra el índice de la clave o el punto de inserción
+        lo = 0  # en una lista ordenada
+        hi = self.__nItems - 1  # Busca entre los límites lo y hi
+        while lo <= hi:
+            mid = (lo + hi) // 2  # Selecciona el punto medio
+            if self.__key(self.__a[mid]) == key:  # ¿Encontramos la clave?
+                return mid  # Devuelve la ubicación del elemento
+            elif self.__key(self.__a[mid]) < key:  # ¿Está la clave en la mitad superior?
+                lo = mid + 1  # Sí, aumenta el límite inferior
+            else:
+                hi = mid - 1  # No, pero podría estar en la mitad inferior
+        return lo  # Elemento no encontrado, devuelve el punto de inserción
+
+    def search(self, key):
+        idx = self.find(key)  # Busca un registro por su clave
+        if idx < self.__nItems and self.__key(self.__a[idx]) == key:
+            return self.__a[idx]  # Devuelve el elemento si se encuentra
+
+    def insert(self, item):  # Inserta un elemento en la posición correcta
+        if self.__nItems >= len(self.__a):  # Si el array está lleno,
+            raise Exception("Array overflow")  # lanza una excepción
+        j = self.find(self.__key(item))  # Encuentra dónde debería ir el elemento
+        for k in range(self.__nItems, j, -1):  # Mueve los elementos mayores a la derecha
+            self.__a[k] = self.__a[k - 1]
+        self.__a[j] = item  # Inserta el elemento
+        self.__nItems += 1  # Incrementa el número de elementos
+
+    def delete(self, item):  # Elimina cualquier ocurrencia del elemento
+        j = self.find(self.__key(item))  # Intenta encontrar el elemento
+        if j < self.__nItems and self.__a[j] == item:  # Si lo encuentra,
+            self.__nItems -= 1  # Reduce el número de elementos
+            for k in range(j, self.__nItems):  # Mueve los elementos mayores a la izquierda
+                self.__a[k] = self.__a[k + 1]
+            return True  # Devuelve éxito
+        return False  # Llega aquí si no encuentra el elemento
+
+    def merge(self, other):  # Fusiona otra matriz ordenada en la actual
+        # Verifica si ambas matrices usan la misma función clave
+        if self.__key != other._OrderedRecordArray__key:
+            raise ValueError("Las funciones clave no coinciden. No se puede fusionar.")
+
+        # Crea un nuevo arreglo suficientemente grande
+        merged_array = [None] * (self.__nItems + other._OrderedRecordArray__nItems)
+        
+        i, j, k = 0, 0, 0  # Índices para self, other y merged_array
+
+        # Realiza la mezcla ordenada
+        while i < self.__nItems and j < other._OrderedRecordArray__nItems:
+            if self.__key(self.__a[i]) <= self.__key(other._OrderedRecordArray__a[j]):
+                merged_array[k] = self.__a[i]
+                i += 1
+            else:
+                merged_array[k] = other._OrderedRecordArray__a[j]
+                j += 1
+            k += 1
+
+        # Copia los elementos restantes de la matriz actual
+        while i < self.__nItems:
+            merged_array[k] = self.__a[i]
+            i += 1
+            k += 1
+
+        # Copia los elementos restantes de la matriz de origen
+        while j < other._OrderedRecordArray__nItems:
+            merged_array[k] = other._OrderedRecordArray__a[j]
+            j += 1
+            k += 1
+
+        # Actualiza el arreglo actual con los elementos fusionados
+        self.__a = merged_array
+        self.__nItems = k  # Actualiza el número total de elementos
+
+
+
+
+OrderedRecordArrayClient.py:
+
+from OrderedRecordArray import *
+def second(x): # Key on second element of record
+ return x[1]
+
+# Crear dos arreglos ordenados con la misma función clave
+arr1 = OrderedRecordArray(10, second)
+arr2 = OrderedRecordArray(10, second)
+
+# Insertar elementos en arr1
+for rec in [('a', 1.5), ('b', 2.1), ('c', 4.3)]:
+    arr1.insert(rec)
+
+# Insertar elementos en arr2
+for rec in [('d', 0.5), ('e', 3.1), ('f', 5.2)]:
+    arr2.insert(rec)
+
+print("Arreglo 1 antes de la fusión:")
+arr1.traverse()
+
+print("\nArreglo 2 antes de la fusión:")
+arr2.traverse()
+
+# Fusionar arr2 en arr1
+arr1.merge(arr2)
+
+print("\nArreglo 1 después de la fusión:")
+arr1.traverse()

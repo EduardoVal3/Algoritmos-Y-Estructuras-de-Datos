@@ -1,0 +1,275 @@
+EJERCICIO 1:
+
+5.1 Reescriba los métodos traverse(), __str__() y __len__() de la clase LinkedList que se muestra en el listado 5-4 para usar el iterador (creado por el generador) que se muestra en el listado 5-23.
+
+listado 5-4:
+class LinkedList(object): # A linked list of data elements
+ def __init__(self): # Constructor
+ self.__first = None # Reference to first Link
+ def getFirst(self): return self.__first # Return the first link
+ def setFirst(self, link): # Change the first link to a new Link
+ if link is None or isinstance(link, Link): # It must be None or
+ self.__first = link # a Link object
+ else:
+ raise Exception("First link must be Link or None")
+ def getNext(self): return self.getFirst() # First link is next
+ def setNext(self, link): self.setFirst(link) # First link is next
+ def isEmpty(self): # Test for empty list
+ return self.getFirst() is None # True iff no first Link
+ def first(self): # Return the first item in the list
+ if self.isEmpty(): # as long as it is not empty
+ raise Exception('No first item in empty list')
+ return self.getFirst().getData() # Return data item (not Link)
+ def traverse(self, # Apply a function to all items in list
+ func=print): # with the default being to print
+ link = self.getFirst() # Start with first link
+ while link is not None: # Keep going until no more links
+ func(link.getData()) # Apply the function to the item
+ link = link.getNext() # Move on to next link
+ def __len__(self): # Get length of list
+ l = 0
+ link = self.getFirst() # Start with first link
+ while link is not None: # Keep going until no more links
+ l += 1 # Count Link in chain
+ link = link.getNext() # Move on to next link
+ return l
+ def __str__(self): # Build a string representation
+ result = "[" # Enclose list in square brackets
+ link = self.getFirst() # Start with first link
+ while link is not None: # Keep going until no more links
+ if len(result) > 1: # After first link,
+ result += " > " # separate links with right arrowhead
+ result += str(link) # Append string version of link
+ link = link.getNext() # Move on to next link
+ return result + "]" # Close with square bracket
+
+
+
+listado 5-23:
+class LinkedList(object):
+… (other definitions shown before) …
+ def __iter__(self): # Define an iterator for the list
+ next = self.getFirst() # Start with first Link
+ while next is not None: # As long as the link is not None,
+ yield next.getData() # yield data for the link
+ next = next.getNext() # then move on to next link
+
+
+
+
+SOLUCION:
+
+LinkedList.py:
+class LinkedList(object):  # Una lista enlazada de elementos de datos
+    def __init__(self):  # Constructor
+        self.__first = None  # Referencia al primer nodo (Link)
+
+    def getFirst(self):
+        return self.__first  # Retorna el primer nodo (Link)
+
+    def setFirst(self, link):  # Cambia el primer nodo (Link)
+        if link is None or isinstance(link, Link):  # Debe ser None o un objeto Link
+            self.__first = link
+        else:
+            raise Exception("El primer nodo debe ser un Link o None")
+
+    def getNext(self):
+        return self.getFirst()  # El primer nodo es el siguiente
+
+    def setNext(self, link):
+        self.setFirst(link)  # El primer nodo es el siguiente
+
+    def isEmpty(self):  # Verifica si la lista está vacía
+        return self.getFirst() is None  # True si no hay primer nodo
+
+    def first(self):  # Retorna el primer elemento en la lista
+        if self.isEmpty():  # Solo si no está vacía
+            raise Exception('No hay primer elemento en la lista vacía')
+        return self.getFirst().getData()  # Retorna el dato del primer nodo
+
+    def __iter__(self):  # Define un iterador para la lista
+        next = self.getFirst()  # Empieza con el primer nodo
+        while next is not None:  # Mientras el nodo no sea None
+            yield next.getData()  # Yields el dato del nodo
+            next = next.getNext()  # Luego pasa al siguiente nodo
+
+    def traverse(self, func=print):  # Aplica una función a todos los elementos de la lista
+        for data in self:  # Utiliza el iterador para recorrer la lista
+            func(data)  # Aplica la función (por defecto print)
+
+    def __len__(self):  # Retorna la longitud de la lista
+        return sum(1 for _ in self)  # Cuenta los elementos usando el iterador
+
+    def __str__(self):  # Crea una representación en cadena de la lista
+        return "[" + " > ".join(str(data) for data in self) + "]"  # Une los datos con " > " y los rodea con corchetes
+
+Si; Continuando: devuelveme el siguente codigo con las explicaciones de los comentarios en español:
+class Link(object): # One datum in a linked list
+ def __init__(self, datum, next=None): # Constructor
+ self.__data = datum # The datum for this link
+ self.__next = next # Reference to next Link
+ def getData(self): # Return the datum stored in this
+link
+ return self.__data
+ def setData(self, datum): # Change the datum in this Link
+ self.__data = datum
+ def getNext(self): return self.__next # Return the next link
+ def setNext(self, link): # Change the next link to a new
+Link
+ if link is None or isinstance(link, Link): #Must be Link or
+None
+ self.__next = link
+ else:
+ raise Exception("Next link must be Link or None")
+ def isLast(self): # Test if link is last in the chain
+ return self.getNext() is None # True if & only if no next
+Link
+ def __str__(self): # Make a string representation of
+link
+ return str(self.getData())
+
+Link.py:
+class Link(object): # One datum in a linked list
+ def __init__(self, datum, next=None): # Constructor
+ self.__data = datum # The datum for this link
+ self.__next = next # Reference to next Link
+ def getData(self): # Return the datum stored in this
+link
+ return self.__data
+ def setData(self, datum): # Change the datum in this Link
+ self.__data = datum
+ def getNext(self): return self.__next # Return the next link
+ def setNext(self, link): # Change the next link to a new
+Link
+ if link is None or isinstance(link, Link): #Must be Link or
+None
+ self.__next = link
+ else:
+ raise Exception("Next link must be Link or None")
+ def isLast(self): # Test if link is last in the chain
+ return self.getNext() is None # True if & only if no next
+Link
+ def __str__(self): # Make a string representation of
+link
+ return str(self.getData())
+
+
+Client:
+def main():
+    # Crear una lista enlazada y agregar elementos
+    linked_list = LinkedList()
+    
+    # Añadir algunos datos de ejemplo
+    linked_list.setFirst(Link(10))  # Primer elemento
+    linked_list.getFirst().setNext(Link(20))  # Segundo elemento
+    linked_list.getFirst().getNext().setNext(Link(30))  # Tercer elemento
+    
+    # Probar el método __len__ para obtener la longitud de la lista
+    print("La longitud de la lista es:", len(linked_list))  # Debería ser 3
+
+    # Probar el método __str__ para obtener la representación en cadena de la lista
+    print("Contenido de la lista enlazada:", str(linked_list))  # Debería mostrar [10 > 20 > 30]
+
+    # Probar el método traverse con el iterador para aplicar una función a cada elemento
+    print("Recorrido de la lista usando traverse:")
+    linked_list.traverse(lambda x: print(f"Elemento: {x}"))  # Imprime cada elemento en la lista
+
+# Llamar a la función principal para ejecutar el cliente
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+LinkedList.py:
+class Link(object):  # Un nodo en una lista enlazada
+    def __init__(self, datum, next=None):  # Constructor
+        self.__data = datum  # El dato para este nodo
+        self.__next = next  # Referencia al siguiente nodo (Link)
+
+    def getData(self):  # Retorna el dato almacenado en este nodo
+        return self.__data
+
+    def setData(self, datum):  # Cambia el dato en este nodo
+        self.__data = datum
+
+    def getNext(self):  # Retorna el siguiente nodo (Link)
+        return self.__next
+
+    def setNext(self, link):  # Cambia el siguiente nodo por un nuevo Link
+        if link is None or isinstance(link, Link):
+            self.__next = link
+        else:
+            raise Exception("El siguiente enlace debe ser un Link o None")
+
+    def isLast(self):  # Verifica si este nodo es el último en la cadena
+        return self.getNext() is None  # True si y solo si no hay un siguiente nodo
+
+    def __str__(self):  # Crea una representación en cadena de este nodo
+        return str(self.getData())
+
+class LinkedList(object):  # Clase lista enlazada
+    def __init__(self):  # Constructor
+        self.__first = None  # Primer enlace (inicio de la lista)
+
+    def getFirst(self):  # Retorna el primer enlace
+        return self.__first
+
+    def setFirst(self, link):  # Cambia el primer enlace de la lista
+        if link is None or isinstance(link, Link):
+            self.__first = link
+        else:
+            raise Exception("El primer enlace debe ser un Link o None")
+
+    def __iter__(self):  # Definir el iterador para recorrer la lista
+        current = self.getFirst()  # Comenzamos desde el primer enlace
+        while current is not None:  # Mientras haya enlaces
+            yield current.getData()  # Devolvemos los datos del enlace
+            current = current.getNext()  # Nos movemos al siguiente enlace
+
+    def traverse(self, func=print):  # Recorre la lista y aplica una función a cada elemento
+        for data in self:  # Usamos el iterador
+            func(data)
+
+    def __len__(self):  # Obtiene la longitud de la lista
+        length = 0
+        for _ in self:  # Usamos el iterador para contar los elementos
+            length += 1
+        return length
+
+    def __str__(self):  # Crea una representación en cadena de la lista
+        return " > ".join(str(data) for data in self)  # Usamos el iterador para convertir los datos en cadena
+
+
+
+
+LinkedlistClient.py:
+from LinkedList import LinkedList, Link
+
+def main():
+    # Crear una lista enlazada
+    linked_list = LinkedList()
+    
+    # Crear algunos enlaces (nodos) e insertarlos en la lista
+    node1 = Link(10)
+    node2 = Link(20)
+    node3 = Link(30)
+    
+    linked_list.setFirst(node1)  # Establecer el primer enlace
+    node1.setNext(node2)  # Enlazar el primer nodo al segundo
+    node2.setNext(node3)  # Enlazar el segundo nodo al tercero
+
+    # Probar el método __len__ para obtener la longitud de la lista
+    print("La longitud de la lista es:", len(linked_list))  # Debería ser 3
+
+    # Probar el método __str__ para obtener la representación en cadena de la lista
+    print("Contenido de la lista enlazada:", str(linked_list))  # Debería mostrar 10 > 20 > 30
+
+    # Probar el método traverse con el iterador para aplicar una función a cada elemento
+    print("Recorrido de la lista usando traverse:")
+    linked_list.traverse(lambda x: print(f"Elemento: {x}"))  # Imprime cada elemento en la lista
+
+# Llamar a la función principal para ejecutar el cliente
+if __name__ == "__main__":
+    main()

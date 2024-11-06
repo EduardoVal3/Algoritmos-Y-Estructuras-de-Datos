@@ -1,0 +1,7 @@
+EJERCICIO 5:
+
+3.5 Modifique el método insertionSort() en SortArray.py (Listado 3-4) para que cuente el número de copias y el número de comparaciones de elementos que realiza durante una clasificación y muestre los totales. Debe observar la condición del bucle en el bucle while interno y contar cuidadosamente las comparaciones de artículos. Utilice este programa para medir el número de copias y comparaciones de diferentes cantidades de datos ordenados inversamente. ¿Los resultados verifican la eficiencia de O(N2)? Haga lo mismo con los datos casi ordenados (solo unos pocos elementos fuera de lugar). ¿Qué se puede deducir sobre la eficiencia de este algoritmo para datos casi ordenados? 
+
+
+
+SOLUCION:
