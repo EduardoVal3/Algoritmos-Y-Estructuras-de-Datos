@@ -1,0 +1,758 @@
+EJERCICIO 1:
+
+8.1 Modifique la clase BinarySearchTree descrita en este capítulo para permitir nodos con claves duplicadas. Tres métodos se ven afectados: __find(), insert() y delete(). Elija insertar nuevos elementos secundarios a la izquierda en el nivel más superficial entre las teclas iguales, como se muestra en el lado izquierdo de la Figura 8-26, y siempre busque y elimine la más profunda entre las teclas iguales. Más específicamente, los métodos __find() y search() deben devolver la más profunda entre las claves iguales que encuentren, pero deben permitir un parámetro opcional para especificar la búsqueda de la más superficial. El método insert() debe manejar el caso en que el elemento a insertar duplica un nodo existente, insertando un nuevo nodo con un hijo izquierdo vacío debajo de la clave duplicada más profunda. El método delete() debe eliminar el nodo más profundo entre las claves duplicadas, proporcionando así un comportamiento LIFO o similar a una pila entre las claves duplicadas. Piense detenidamente en los casos de eliminación y si cambia la elección de los nodos sucesores. Demuestre cómo funciona la implementación en un árbol insertando varias claves duplicadas asociadas a diferentes valores. A continuación, elimine esas claves y muestre sus valores para que quede claro que el último duplicado insertado es el primer duplicado eliminado.
+
+BinarySearchTree.py:
+class BinarySearchTree(object): # A binary search tree class
+ 
+ def __init__(self): # The tree organizes nodes by their
+ self.__root = None # keys. Initially, it is empty.
+
+
+ class __Node(object): # A node in a binary search tree
+
+ def __init__( # Constructor takes a key that is
+ self, # used to determine the position
+ key, # inside the search tree,
+ data, # the data associated with the key
+ left=None, # and a left and right child node
+ right=None): # if known
+ self.key = key # Copy parameters to instance
+ self.data = data # attributes of the object
+ self.leftChild = left
+ self.rightChild = right
+
+ def __str__(self): # Represent a node as a string
+ return "{" + str(self.key) + ", " + str(self.data) + "}"
+
+ def __init__(self): # The tree organizes nodes by their
+ self.__root = None # keys. Initially, it is empty.
+
+ def isEmpty(self): # Check for empty tree
+ return self.__root is None
+
+ def root(self): # Get the data and key of the rootnode
+ if self.isEmpty(): # If the tree is empty, raiseexception
+ raise Exception("No root node in empty tree")
+ return (self.__root.data, self.__root.key) # Otherwise return root data and itskey
+
+ def __find(self, goal): # Find an internal node whose key
+ current = self.__root # matches goal and its parent. Start at
+ parent = self # root and track parent of current node
+ while (current and # While there is a tree left to explore
+ goal != current.key): # and current key isn'tthe goal
+ parent = current # Prepare to move onelevel down
+ current = ( # Advance current to leftsubtree when
+ current.leftChild if goal < current.key else # goal is
+ current.rightChild) # less than current key,else right
+ # If the loop ended on a node, it must have the goal key
+ return (current, parent) # Return the node or Noneand parent
+
+ def search(self, goal): # Public method to get dataassociated
+ node, p = self.__find(goal) # with a goal key. First,find node
+ return node.data if node else None # w/ goal & return any data
+
+ def insert(self, # Insert a new node in a binary
+ key, # search tree finding where its key
+ data): # places it and storing its data
+ node, parent = self.__find( # Try finding the key in the tree
+ key) # and getting its parent node
+ if node: # If we find a node with this key,
+ node.data = data # then update the node's data
+ return False # and return flag for no insertion
+ if parent is self: # For empty trees, insert new node at
+ self.__root = self.__Node(key, data) # root of tree
+ elif key < parent.key: # If new key is less than parent's key,
+ parent.leftChild = self.__Node( # insert new node as left
+ key, data, right=node) # child of parent
+ else: # Otherwise insert new node as right
+ parent.rightChild = self.__Node( # child of parent
+ key, data, right=node)
+ return True # Return flag for validinsertion
+
+ def inOrderTraverse( # Visit all nodes of the tree in-order
+ self, function=print): # and apply a function to each node
+ self.__inOrderTraverse( # Call recursive versión starting at
+ self.__root, function=function) # root node
+
+ def __inOrderTraverse( # Visit a subtree in-order, recursively
+ self, node, function): # The subtree's root is node
+ if node: # Check that this is real subtree
+ self.__inOrderTraverse( # Traverse the left subtree
+ node.leftChild, function)
+ function(node) # Visit this node
+ self.__inOrderTraverse( # Traverse the right subtree
+ node.rightChild, function)
+
+ def traverse_rec(self, # Traverse the tree recursively in
+ traverseType="in"): # pre, in, or post order
+ if traverseType in [ # Verify type is an accepted value and
+ 'pre', 'in', 'post']: # use generator to walk the tree
+ return self.__traverse( # yielding (key, data) pairs
+ self.__root, traverseType) # starting at root
+ raise ValueError("Unknown traversal type: " + str(traverseType))
+
+ def __traverse(self, # Recursive generator to traverse
+ node, # subtree rooted at node in pre, in, or
+ traverseType): # post order
+ if node is None: # If subtree is empty,
+ return # traversal is done
+ if traverseType == "pre": # For pre-order, yield the current
+ yield (node.key, node.data) # node before all the others
+ for childKey, childData in self.__traverse( # Recursively
+ node.leftChild, traverseType): # traverse the left subtree
+ yield (childKey, childData) # yielding its nodes
+ if traverseType == "in": # If in-order, now yield the current
+ yield (node.key, node.data) # node
+ for childKey, childData in self.__traverse( # Recursively
+ node.rightChild, traverseType):# traverse right subtree
+ yield (childKey, childData) # yielding its nodes
+ if traverseType == "post": # If post-order, yield the current
+ yield (node.key, node.data) # node after all the others
+
+ def traverse(self, # Non-recursive generator to traverse
+ traverseType='in'): # tree in pre, in, or post order
+ if traverseType not in [ # Verify traversal type is an
+ 'pre', 'in', 'post']: # accepted value
+ raise ValueError(
+ "Unknown traversal type: " + str(traverseType))
+ stack = Stack() # Create a stack
+ stack.push(self.__root) # Put root node in stack
+ while not stack.isEmpty(): # While there is work in the stack
+ item = stack.pop() # Get next item
+ if isinstance(item, self.__Node): # If it's a tree node
+ if traverseType == 'post': # For post-order, put it last
+ stack.push((item.key, item.data))
+ stack.push(item.rightChild) # Traverse right child
+ if traverseType == 'in': # For pre-order, put item 2nd
+ stack.push((item.key, item.data))
+ stack.push(item.leftChild) # Traverse left child
+ if traverseType == 'pre': # For pre-order, put item 1st
+ stack.push((item.key, item.data))
+ elif item: # Every other non-None item is a
+ yield item # (key, value) pair to be yielded
+
+ def delete(self, goal): # Delete a node whose key matches goal
+ node, parent = self.__find(goal) # Find goal and its parent
+ if node is not None: # If node was found,
+ return self.__delete( # then perform deletion at node
+ parent, node) # under the parent
+
+ def __delete(self, # Delete the specified node in the tree
+ parent, node): # modifying the parent node/tree
+ deleted = node.data # Save the data that's to be deleted
+ if node.leftChild: # Determine number of subtrees
+ if node.rightChild: # If both subtrees exist,
+ self.__promote_successor( # Then promote successor to
+ node) # replace deleted node
+ else: # If no right child, move left child up
+ if parent is self: # If parent is the whole tree,
+ self.__root = node.leftChild # update root 
+ elif parent.leftChild is node: # If node is parent's left,
+ parent.leftChild = node.leftChild # child, update left
+ else: # else update right child
+ parent.rightChild = node.leftChild
+ else: # No left child; so promote right child
+ if parent is self: # If parent is the whole tree,
+ self.__root = node.rightChild # update root
+ elif parent.leftChild is node: # If node is parent's left
+ parent.leftChild = node.rightChild # child, then update
+ else: # left child link else update
+ parent.rightChild = node.rightChild # right child
+ return deleted # Return the deleted node's data
+
+ def __promote_successor( # When deleting a node with both subtrees,
+ self, # find successor on the right subtree, put
+ # its data in this node, and delete the
+ node): # successor from the right subtree
+ successor = node.rightChild # Start search for successor in
+ parent = node # right subtree and track its parent
+ while successor.leftChild: # Descend left child links until
+ parent = successor # no more left links, tracking parent
+ successor = successor.leftChild
+ node.key = successor.key # Replace node to delete with
+ node.data = successor.data # successor's key and data
+ self.__delete(parent, successor) # Remove successor node
+
+ def levels(self): # Count the levels in the tree
+ return self.__levels(self.__root) # Count starting at root
+
+ def __levels(self, node): # Recursively count levels in subtree
+ if node: # If a node is provided, then level is 1
+ return 1 + max(self.__levels(node.leftChild), # more than
+ self.__levels(node.rightChild)) # max child
+ else: return 0 # Empty subtree has no levels
+ def nodes(self): # Count the tree nodes, using iterator
+ count = 0 # Assume an empty tree
+ for key, data in self.traverse(): # Iterate over all keys in any
+ count += 1 # order and increment count
+ return count
+
+ def print(self, # Print the tree sideways with 1 node
+ indentBy=4): # on each line and indenting each level
+ self.__pTree(self.__root, # by some blanks. Start at root node
+ "ROOT: ", "", indentBy) # with no indent
+
+ def __pTree(self, # Recursively print a subtree, sideways
+ node, # with the root node left justified
+ nodeType, # nodeType shows the relation to its
+ indent, # parent and the indent shows its level
+ indentBy=4): # Increase indent level for subtrees
+ if node: # Only print if there is a node
+ self.__pTree(node.rightChild, "RIGHT: ", # Print the right
+ indent + " " * indentBy, indentBy) # subtree
+ print(indent + nodeType, node) # Print this node
+ self.__pTree(node.leftChild, "LEFT: ", # Print the left
+ indent + " " * indentBy, indentBy) # subtree
+
+
+
+
+BinarySearchTree.py 2.0:
+class BinarySearchTree:
+    class __Node:
+        def __init__(self, key, data, left=None, right=None):
+            self.key = key
+            self.data = data
+            self.leftChild = left
+            self.rightChild = right
+
+        def __str__(self):
+            return f"{{{self.key}, {self.data}}}"
+
+    def __init__(self):
+        self.__root = None
+
+    def isEmpty(self):
+        return self.__root is None
+
+    def root(self):
+        if self.isEmpty():
+            raise Exception("No root node in empty tree")
+        return (self.__root.data, self.__root.key)
+
+    def __find(self, goal):
+        current = self.__root
+        parent = self
+        while current and goal != current.key:
+            parent = current
+            current = current.leftChild if goal < current.key else current.rightChild
+        return current, parent
+
+    def search(self, goal):
+        node, _ = self.__find(goal)
+        return node.data if node else None
+
+    def insert(self, key, data):
+        node, parent = self.__find(key)
+        if node:
+            node.data = data
+            return False
+        if parent is self:
+            self.__root = self.__Node(key, data)
+        elif key < parent.key:
+            parent.leftChild = self.__Node(key, data)
+        else:
+            parent.rightChild = self.__Node(key, data)
+        return True
+
+    def __inOrderTraverse(self, node, function):
+        if node:
+            self.__inOrderTraverse(node.leftChild, function)
+            function(node)
+            self.__inOrderTraverse(node.rightChild, function)
+
+    def inOrderTraverse(self, function=print):
+        self.__inOrderTraverse(self.__root, function)
+
+    def __delete(self, parent, node):
+        deleted = node.data
+        if node.leftChild:
+            if node.rightChild:
+                self.__promote_successor(node)
+            else:
+                if parent is self:
+                    self.__root = node.leftChild
+                elif parent.leftChild is node:
+                    parent.leftChild = node.leftChild
+                else:
+                    parent.rightChild = node.leftChild
+        else:
+            if parent is self:
+                self.__root = node.rightChild
+            elif parent.leftChild is node:
+                parent.leftChild = node.rightChild
+            else:
+                parent.rightChild = node.rightChild
+        return deleted
+
+    def __promote_successor(self, node):
+        successor = node.rightChild
+        parent = node
+        while successor.leftChild:
+            parent = successor
+            successor = successor.leftChild
+        node.key = successor.key
+        node.data = successor.data
+        self.__delete(parent, successor)
+
+    def delete(self, goal):
+        node, parent = self.__find(goal)
+        if node is not None:
+            return self.__delete(parent, node)
+        return None
+
+    def levels(self):
+        return self.__levels(self.__root)
+
+    def __levels(self, node):
+        if node:
+            return 1 + max(self.__levels(node.leftChild), self.__levels(node.rightChild))
+        return 0
+
+    def nodes(self):
+        count = 0
+        for _, _ in self.traverse():
+            count += 1
+        return count
+
+    def traverse(self, traverseType='in'):
+        if traverseType not in ['pre', 'in', 'post']:
+            raise ValueError("Unknown traversal type: " + str(traverseType))
+        return self.__traverse(self.__root, traverseType)
+
+    def __traverse(self, node, traverseType):
+        if node is None:
+            return
+        if traverseType == "pre":
+            yield (node.key, node.data)
+        yield from self.__traverse(node.leftChild, traverseType)
+        if traverseType == "in":
+            yield (node.key, node.data)
+        yield from self.__traverse(node.rightChild, traverseType)
+        if traverseType == "post":
+            yield (node.key, node.data)
+
+    def print(self, indentBy=4):
+        self.__pTree(self.__root, "ROOT: ", "", indentBy)
+
+    def __pTree(self, node, nodeType, indent, indentBy=4):
+        if node:
+            self.__pTree(node.rightChild, "RIGHT: ", indent + " " * indentBy, indentBy)
+            print(indent + nodeType, node)
+            self.__pTree(node.leftChild, "LEFT: ", indent + " " * indentBy, indentBy)
+
+
+
+
+ BinarySearchTreeTester.py:
+# Test the BinarySearchTree class interactively
+from BinarySearchTree import *
+theTree = BinarySearchTree() # Start with an empty tree
+theTree.insert("Don", "1974 1") # Insert some data
+theTree.insert("Herb", "1975 2")
+theTree.insert("Ken", "1979 1")
+theTree.insert("Ivan", "1988 1")
+theTree.insert("Raj", "1994 1")
+theTree.insert("Amir", "1996 1")
+theTree.insert("Adi", "2002 3")
+theTree.insert("Ron", "2002 3")
+theTree.insert("Fran", "2006 1")
+theTree.insert("Vint", "2006 2")
+theTree.insert("Tim", "2016 1")
+def print_commands(names): # Print a list of possible commands
+ print('The possible commands are', names)
+def clearTree(): # Remove all the nodes in the tree
+ while not theTree.isEmpty():
+ data, key = theTree.root()
+ theTree.delete(key)
+def traverseTree(traverseType="in"): # Traverse & print all nodes
+ for key, data in theTree.traverse(traverseType):
+ print('{', str(key), ', ', str(data), '}', end=' ')
+ print()
+commands = [ # Command names, functions, and their parameters
+ ['print', theTree.print, []],
+ ['insert', theTree.insert, ('key', 'data')],
+ ['delete', theTree.delete, ('key', )],
+ ['search', theTree.search, ('key', )],
+ ['traverse', traverseTree, ('type', )],
+ ['clear', clearTree, []],
+ ['help', print_commands, []],
+ ['?', print_commands, []],
+ ['quit', None, []],
+]
+ # Collect all the command names in a list
+command_names = ", ".join(c[0] for c in commands)
+for i in range(len(commands)): # Put command names in argument list
+ if commands[i][1] == print_commands: # of print_commands
+ commands[i][2] = [command_names]
+# Create a dictionary mapping first character of command name to
+# command specification (name, function, parameters/args)
+command_dict = dict((c[0][0], c) for c in commands)
+ # Print information for interactive loop
+theTree.print()
+print_commands(command_names)
+ans = ' '
+# Loop to get a command from the user and execute it
+while ans[0] != 'q':
+ print('The tree has', theTree.nodes(), 'nodes across',
+ theTree.levels(), 'levels')
+ ans = input("Enter first letter of command: ").lower()
+ if len(ans) == 0:
+ ans = ' '
+ if ans[0] in command_dict:
+ name, function, parameters = command_dict[ans[0]]
+ if function is not None:
+ print(name)
+ if isinstance(parameters, list):
+ arguments = parameters
+ else:
+ arguments = []
+ for param in parameters:
+ arg = input("Enter " + param + " for " + name + " " +
+ "command: ")
+ arguments.append(arg)
+ try:
+ result = function(*arguments)
+ print('Result:', result)
+ except Exception as e:
+ print('Exception occurred')
+ print(e)
+ else:
+ print("Invalid command: '", ans, "'")
+
+
+ BinarySearchTreeTester.py_2.0:
+# BinarySearchTreeTester.py
+# Test the BinarySearchTree class interactively
+from BinarySearchTree import *
+
+theTree = BinarySearchTree()  # Start with an empty tree
+
+# Insert some data
+theTree.insert("Don", "1974 1")
+theTree.insert("Herb", "1975 2")
+theTree.insert("Ken", "1979 1")
+theTree.insert("Ivan", "1988 1")
+theTree.insert("Raj", "1994 1")
+theTree.insert("Amir", "1996 1")
+theTree.insert("Adi", "2002 3")
+theTree.insert("Ron", "2002 3")
+theTree.insert("Fran", "2006 1")
+theTree.insert("Vint", "2006 2")
+theTree.insert("Tim", "2016 1")
+
+def print_commands(names):  # Print a list of possible commands
+    print('The possible commands are', names)
+
+def clearTree():  # Remove all the nodes in the tree
+    while not theTree.isEmpty():
+        data, key = theTree.root()
+        theTree.delete(key)
+
+def traverseTree(traverseType="in"):  # Traverse & print all nodes
+    for key, data in theTree.traverse(traverseType):
+        print('{', str(key), ', ', str(data), '}', end=' ')
+    print()
+
+commands = [  # Command names, functions, and their parameters
+    ['print', theTree.print, []],
+    ['insert', theTree.insert, ('key', 'data')],
+    ['delete', theTree.delete, ('key',)],
+    ['search', theTree.search, ('key',)],
+    ['traverse', traverseTree, ('type',)],
+    ['clear', clearTree, []],
+    ['help', print_commands, []],
+    ['?', print_commands, []],
+    ['quit', None, []],
+]
+
+# Collect all the command names in a list
+command_names = ", ".join(c[0] for c in commands)
+
+for i in range(len(commands)):  # Put command names in argument list
+    if commands[i][1] == print_commands:  # of print_commands
+        commands[i][2] = [command_names]
+
+# Create a dictionary mapping first character of command name to
+# command specification (name, function, parameters/args)
+command_dict = dict((c[0][0], c) for c in commands)
+
+# Print information for interactive loop
+theTree.print()
+print_commands(command_names)
+ans = ' '
+
+# Loop to get a command from the user and execute it
+while ans[0] != 'q':
+    print('The tree has', theTree.nodes(), 'nodes across',
+          theTree.levels(), 'levels')
+    ans = input("Enter first letter of command: ").lower()
+    if len(ans) == 0:
+        ans = ' '
+    if ans[0] in command_dict:
+        name, function, parameters = command_dict[ans[0]]
+        if function is not None:
+            print(name)
+            if isinstance(parameters, list):
+                arguments = parameters
+            else:
+                arguments = []
+            for param in parameters:
+                arg = input("Enter " + param + " for " + name + " command: ")
+                arguments.append(arg)
+            try:
+                result = function(*arguments)
+                print('Result:', result)
+            except Exception as e:
+                print('Exception occurred')
+                print(e)
+    else:
+        print("Invalid command: '", ans, "'")
+
+
+
+
+
+EN ESPAÑOL:
+# BinarySearchTreeTester.py
+# Prueba interactiva de la clase BinarySearchTree
+from BinarySearchTree import *
+
+theTree = BinarySearchTree()  # Comenzar con un árbol vacío
+
+# Insertar algunos datos
+theTree.insert("Don", "1974 1")
+theTree.insert("Herb", "1975 2")
+theTree.insert("Ken", "1979 1")
+theTree.insert("Ivan", "1988 1")
+theTree.insert("Raj", "1994 1")
+theTree.insert("Amir", "1996 1")
+theTree.insert("Adi", "2002 3")
+theTree.insert("Ron", "2002 3")
+theTree.insert("Fran", "2006 1")
+theTree.insert("Vint", "2006 2")
+theTree.insert("Tim", "2016 1")
+
+def print_commands(names):  # Imprimir una lista de los comandos posibles
+    print('Los comandos disponibles son:', names)
+
+def clearTree():  # Eliminar todos los nodos del árbol
+    while not theTree.isEmpty():
+        data, key = theTree.root()
+        theTree.delete(key)
+
+def traverseTree(traverseType="in"):  # Recorrer e imprimir todos los nodos
+    for key, data in theTree.traverse(traverseType):
+        print('{', str(key), ', ', str(data), '}', end=' ')
+    print()
+
+# Lista de comandos con su función asociada y parámetros requeridos
+commands = [
+    ['print', theTree.print, []],
+    ['insert', theTree.insert, ('key', 'data')],
+    ['delete', theTree.delete, ('key',)],
+    ['search', theTree.search, ('key',)],
+    ['traverse', traverseTree, ('type',)],
+    ['clear', clearTree, []],
+    ['help', print_commands, []],
+    ['?', print_commands, []],
+    ['quit', None, []],
+]
+
+# Recopilar todos los nombres de los comandos en una lista
+command_names = ", ".join(c[0] for c in commands)
+
+# Agregar nombres de comandos como argumento para la función print_commands
+for i in range(len(commands)):
+    if commands[i][1] == print_commands:
+        commands[i][2] = [command_names]
+
+# Crear un diccionario que mapea la primera letra del nombre del comando
+# con la especificación del comando (nombre, función, parámetros/argumentos)
+command_dict = dict((c[0][0], c) for c in commands)
+
+# Imprimir información para el bucle interactivo
+theTree.print()
+print_commands(command_names)
+ans = ' '
+
+# Bucle para recibir un comando del usuario y ejecutarlo
+while ans[0] != 'q':  # Continuar mientras no se ingrese 'q' (salir)
+    print('El árbol tiene', theTree.nodes(), 'nodos distribuidos en',
+          theTree.levels(), 'niveles')
+    ans = input("Ingresa la primera letra del comando: ").lower()
+    if len(ans) == 0:
+        ans = ' '
+    if ans[0] in command_dict:
+        name, function, parameters = command_dict[ans[0]]
+        if function is not None:
+            print(name)
+            if isinstance(parameters, list):
+                arguments = parameters
+            else:
+                arguments = []
+            for param in parameters:
+                arg = input("Ingresa " + param + " para el comando " + name + ": ")
+                arguments.append(arg)
+            try:
+                result = function(*arguments)
+                print('Resultado:', result)
+            except Exception as e:
+                print('Ocurrió una excepción')
+                print(e)
+    else:
+        print("Comando no válido: '", ans, "'")
+
+
+
+
+SOLUCION:
+
+BinarySearchTreeProgProy.py:
+class BinarySearchTree:
+    class Node:
+        def __init__(self, key, data):
+            self.key = key
+            self.data = data
+            self.left = None
+            self.right = None
+
+    def __init__(self):
+        self.root_node = None
+
+    def isEmpty(self):
+        return self.root_node is None
+
+    def __find(self, key, find_deepest=True):
+        # Encuentra el nodo más profundo (o más superficial si `find_deepest` es False)
+        parent, node, is_left = None, self.root_node, None
+        target_parent, target_node = None, None
+
+        while node:
+            if node.key == key:
+                target_parent, target_node = parent, node
+                if not find_deepest:  # Devuelve la más superficial
+                    break
+            parent = node
+            if key <= node.key:
+                node, is_left = node.left, True
+            else:
+                node, is_left = node.right, False
+
+        return target_parent, target_node, is_left
+
+    def search(self, key, find_deepest=True):
+        _, node, _ = self.__find(key, find_deepest)
+        if node:
+            return node.data
+        return None
+
+    def insert(self, key, data):
+        new_node = self.Node(key, data)
+        if self.isEmpty():
+            self.root_node = new_node
+            return
+
+        parent, node, is_left = None, self.root_node, None
+
+        while node:
+            parent = node
+            if key <= node.key:
+                node, is_left = node.left, True
+            else:
+                node, is_left = node.right, False
+
+        if key <= parent.key:
+            parent.left = new_node
+        else:
+            parent.right = new_node
+
+    def __delete_deepest(self, key):
+        # Borra el nodo más profundo con la clave dada
+        parent, target, is_left = self.__find(key)
+        if not target:
+            return None
+
+        if not target.left and not target.right:  # Nodo hoja
+            if parent:
+                if is_left:
+                    parent.left = None
+                else:
+                    parent.right = None
+            else:  # Raíz sin hijos
+                self.root_node = None
+            return target.data
+
+        # Nodo con un hijo o más
+        if target.left:
+            successor = target.left
+            target.key, target.data = successor.key, successor.data
+            target.left = successor.left
+        elif target.right:
+            successor = target.right
+            target.key, target.data = successor.key, successor.data
+            target.right = successor.right
+
+        return target.data
+
+    def delete(self, key):
+        return self.__delete_deepest(key)
+
+    def __traverse(self, node, result, order):
+        if not node:
+            return
+        if order == "pre":
+            result.append((node.key, node.data))
+        self.__traverse(node.left, result, order)
+        if order == "in":
+            result.append((node.key, node.data))
+        self.__traverse(node.right, result, order)
+        if order == "post":
+            result.append((node.key, node.data))
+
+    def traverse(self, order="in"):
+        result = []
+        self.__traverse(self.root_node, result, order)
+        return result
+
+
+
+
+BinarySearchTreeProgProyTest.py:
+# Código para probar la implementación
+from BinarySearchTreeProgProy import BinarySearchTree
+
+# Crear un árbol binario de búsqueda
+tree = BinarySearchTree()
+
+# Insertar claves con duplicados
+tree.insert(65, "A")
+tree.insert(65, "B")
+tree.insert(65, "C")
+tree.insert(44, "D")
+tree.insert(44, "E")
+tree.insert(81, "F")
+
+# Imprimir el árbol en orden
+print("Árbol en orden (in-order):")
+print(tree.traverse("in"))
+
+# Buscar la clave duplicada más profunda y la más superficial
+print("Buscar clave 65 (más profunda):", tree.search(65, find_deepest=True))
+print("Buscar clave 65 (más superficial):", tree.search(65, find_deepest=False))
+
+# Eliminar duplicados en orden LIFO
+print("\nEliminando claves duplicadas de 65:")
+print("Eliminar 65 (LIFO):", tree.delete(65))
+print("Árbol después de eliminar 65:")
+print(tree.traverse("in"))
+
+print("Eliminar 65 (LIFO):", tree.delete(65))
+print("Árbol después de eliminar 65:")
+print(tree.traverse("in"))
+
+print("Eliminar 65 (LIFO):", tree.delete(65))
+print("Árbol después de eliminar 65:")
+print(tree.traverse("in"))
+
